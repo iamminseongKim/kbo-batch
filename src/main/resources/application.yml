@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/kbo?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    username: kbo
+    password: kbo
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      format_sql: true
+  batch:
+    job:
+      name: leagueStatJob
+    jdbc:
+      initialize-schema: never
+logging:
+  level:
+    org:
+      springframework:
+        batch: INFO
+        jdbc: INFO
