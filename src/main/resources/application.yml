@@ -14,7 +14,7 @@ spring:
       format_sql: true
   batch:
     job:
-      name: leagueStatJob
+      name: playerBatchJob19
     jdbc:
       initialize-schema: never
 logging:
@@ -23,3 +23,5 @@ logging:
       springframework:
         batch: INFO
         jdbc: INFO
+      hibernate:
+        SQL: debug

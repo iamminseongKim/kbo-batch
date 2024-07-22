@@ -58,7 +58,7 @@ public class LeagueBatchConfig {
 
     @Bean
     public Job leagueStatJob(JobRepository jobRepository, @Qualifier("leagueStatStep") Step step, BatchListener listener) {
-        return new JobBuilder("leagueStatJob", jobRepository)
+        return new JobBuilder("leagueStatJob5", jobRepository)
                 .listener(listener)
                 .start(step)
                 .build();
@@ -66,7 +66,7 @@ public class LeagueBatchConfig {
 
     @Bean
     public Step leagueStatStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new StepBuilder("leagueStatStep3", jobRepository)
+        return new StepBuilder("leagueStatStep4", jobRepository)
                 .<LeagueStatDto, LeagueStat>chunk(1, transactionManager)
                 .reader(leagueStatReader())
                 .processor(leagueStatProcessor())

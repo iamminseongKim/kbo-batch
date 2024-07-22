@@ -4,6 +4,7 @@ import hello.kbobatch.domain.type.HandsType;
 import hello.kbobatch.domain.type.Position;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,7 +34,7 @@ public class Player {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY,cascade =  CascadeType.PERSIST)
     @JoinColumn(name = "stat_id")
     private PlayerStat stat;
 
@@ -46,5 +47,23 @@ public class Player {
         team.getPlayers().add(this);
     }
 
+    @Builder
+    public Player(Long id, Position position, String name, String backNum, HandsType type, int age, LocalDate birthDate, int height, int weight, Team team, PlayerStat stat) {
+        this.id = id;
+        this.position = position;
+        this.name = name;
+        this.backNum = backNum;
+        this.type = type;
+        this.age = age;
+        this.birthDate = birthDate;
+        this.height = height;
+        this.weight = weight;
+        this.team = team;
+        this.stat = stat;
+    }
 
+    public Player updateStat(PlayerStat stat) {
+        this.stat = stat;
+        return this;
+    }
 }

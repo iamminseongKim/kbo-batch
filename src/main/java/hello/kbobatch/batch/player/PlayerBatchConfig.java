@@ -1,7 +1,11 @@
 package hello.kbobatch.batch.player;
 
 import hello.kbobatch.batch.BatchListener;
+import hello.kbobatch.batch.league.repository.LeagueStatRepository;
+import hello.kbobatch.domain.LeagueStat;
+import hello.kbobatch.domain.Player;
 import hello.kbobatch.dto.PlayerDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -20,7 +24,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class PlayerBatchConfig {
+
+    private final PlayerRepository playerRepository;
+    private final TeamRepository teamRepository;
+    private final LeagueStatRepository leagueStatRepository;
 
     @Bean
     public ItemReader<PlayerDto> playerReader() {
@@ -34,22 +43,21 @@ public class PlayerBatchConfig {
 
     @Bean
     public PlayerProcessor processor() {
-        return new PlayerProcessor();
+        return new PlayerProcessor(teamRepository, playerRepository, leagueStatRepository);
     }
 
     @Bean
-    public ItemWriter<PlayerDto> writer() {
+    public ItemWriter<Player> writer() {
         return items -> {
-            for (PlayerDto player : items) {
-                //save 로직
-                log.info("Player: {} 저장 완료~", player.getName());
+            for (Player player : items) {
+                playerRepository.save(player);
             }
         };
     }
 
     @Bean
     public Job playerBatchJob(JobRepository jobRepository, @Qualifier("playerStep") Step step, BatchListener listener) {
-        return new JobBuilder("playerBatchJob", jobRepository)
+        return new JobBuilder("playerBatchJob19", jobRepository)
                 .listener(listener)
                 .start(step)
                 .build();
@@ -58,7 +66,7 @@ public class PlayerBatchConfig {
     @Bean
     public Step playerStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("playerStep", jobRepository)
-                .<PlayerDto, PlayerDto> chunk(10, transactionManager)
+                .<PlayerDto, Player> chunk(10, transactionManager)
                 .reader(playerReader())
                 .processor(processor())
                 .writer(writer())

@@ -20,7 +20,7 @@ public class PlayerStatDto {
     private int hbp;
     private double slg;
     private double obp;
-
+    private int ab;
 
     private String era;
     private String inning;
