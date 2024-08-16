@@ -4,6 +4,7 @@ import hello.kbobatch.batch.league.LeagueStatProcessor;
 import hello.kbobatch.batch.league.repository.LeagueStatRepository;
 import hello.kbobatch.batch.player.PlayerProcessor;
 import hello.kbobatch.batch.player.PlayerRepository;
+import hello.kbobatch.batch.player.PlayerStatRepository;
 import hello.kbobatch.batch.player.TeamRepository;
 import hello.kbobatch.domain.LeagueStat;
 import hello.kbobatch.domain.Player;
@@ -37,6 +38,7 @@ public class BatchConfig {
     private final LeagueStatRepository leagueStatRepository;
     private final PlayerRepository playerRepository;
     private final TeamRepository teamRepository;
+    private final PlayerStatRepository playerStatRepository;
 
     @Bean
     public ItemReader<LeagueStatDto> leagueStatReader() {
@@ -72,7 +74,7 @@ public class BatchConfig {
 
     @Bean
     public PlayerProcessor playerProcessor() {
-        return new PlayerProcessor(playerRepository, teamRepository, leagueStatRepository);
+        return new PlayerProcessor(playerRepository, teamRepository, leagueStatRepository, playerStatRepository);
     }
 
     @Bean

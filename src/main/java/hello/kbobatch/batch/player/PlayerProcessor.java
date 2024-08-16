@@ -23,13 +23,15 @@ public class PlayerProcessor implements ItemProcessor<PlayerDto, Player> {
     private final PlayerRepository playerRepository;
     private final TeamRepository teamRepository;
     private final LeagueStatRepository leagueStatRepository;
+    private final PlayerStatRepository playerStatRepository;
 
     private LeagueStat leagueStat;
 
-    public PlayerProcessor(PlayerRepository playerRepository, TeamRepository teamRepository,  LeagueStatRepository leagueStatRepository1) {
+    public PlayerProcessor(PlayerRepository playerRepository, TeamRepository teamRepository, LeagueStatRepository leagueStatRepository1, PlayerStatRepository playerStatRepository) {
         this.playerRepository = playerRepository;
         this.teamRepository = teamRepository;
         this.leagueStatRepository = leagueStatRepository1;
+        this.playerStatRepository = playerStatRepository;
     }
 
     @Override
@@ -56,7 +58,6 @@ public class PlayerProcessor implements ItemProcessor<PlayerDto, Player> {
         PlayerStat stat = player.getStat();
         try {
             stat.updateStat(item.getDetail(), player);
-
             if (!item.getPosition().equals(Position.P) && item.getDetail()!=null) {
                 stat.setWrcPlus(calculateWrcPlus(item, leagueStat));
             }
@@ -76,9 +77,9 @@ public class PlayerProcessor implements ItemProcessor<PlayerDto, Player> {
             detail.setSf(0);
             stat.updateStat(detail, player);
             log.info("{} 선수의 스탯 정보가 없음.", player.getName());
-            return player.updateStat(stat);
         }
 
+        playerStatRepository.save(stat);
         return player.updateStat(stat);
     }
 
