@@ -6,45 +6,85 @@ import hello.kbobatch.domain.Player;
 import hello.kbobatch.domain.PlayerStat;
 import hello.kbobatch.domain.Team;
 import hello.kbobatch.domain.type.Position;
-import hello.kbobatch.domain.type.TeamName;
 import hello.kbobatch.dto.PlayerDto;
 import hello.kbobatch.dto.PlayerStatDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
-
 @Slf4j
 public class PlayerProcessor implements ItemProcessor<PlayerDto, Player> {
 
-    private final TeamRepository teamRepository;
     private final PlayerRepository playerRepository;
-    private final LeagueStat leagueStat;
+    private final TeamRepository teamRepository;
+    private final LeagueStatRepository leagueStatRepository;
 
-    public PlayerProcessor(final TeamRepository teamRepository, final PlayerRepository playerRepository, final LeagueStatRepository leagueStatRepository) {
-        this.teamRepository = teamRepository;
+    private LeagueStat leagueStat;
+
+    public PlayerProcessor(PlayerRepository playerRepository, TeamRepository teamRepository,  LeagueStatRepository leagueStatRepository1) {
         this.playerRepository = playerRepository;
-        this.leagueStat = leagueStatRepository.findAll().getFirst();
+        this.teamRepository = teamRepository;
+        this.leagueStatRepository = leagueStatRepository1;
     }
 
     @Override
-    public Player process(PlayerDto item) {
+    public Player process(PlayerDto item) throws Exception {
 
-        Optional<Player> playerOptional = playerRepository.findByNameAndBirthDate(item.getName(), LocalDate.parse(item.getBirthday()));
-        if (playerOptional.isPresent()) {
-            return updatePlayer(playerOptional.get(), item);
+        // 신규 선수라면 새로 만들어야 하고, 기존 선수라면 스텟을 업데이트해야함.
+
+        Optional<Player> findPlayer = playerRepository.findByNameAndBirthDateWithTeamAndStat(item.getName(), LocalDate.parse(item.getBirthday()));
+        Player player;
+        if (findPlayer.isPresent()) {
+            player = findPlayer.get();
+
+            if (player.getTeam().getTeamCode() != item.getTeam()) {
+                player.changeTeam(teamRepository.findByTeamCode(item.getTeam()));
+            }
+            return updatePlayer(player, item);
         } else {
-            return createPlayer(item);
+             return createPlayer(item);
         }
+    }
+
+    private Player updatePlayer(Player player, PlayerDto item) {
+
+        PlayerStat stat = player.getStat();
+        try {
+            stat.updateStat(item.getDetail(), player);
+
+            if (!item.getPosition().equals(Position.P) && item.getDetail()!=null) {
+                stat.setWrcPlus(calculateWrcPlus(item, leagueStat));
+            }
+        } catch (Exception e) {
+            PlayerStatDto detail = new PlayerStatDto();
+            detail.setAb(0);
+            detail.setBb(0);
+            detail.setEra("0");
+            detail.setH(0);
+            detail.setHbp(0);
+            detail.setHr(0);
+            detail.setTwoH(0);
+            detail.setThreeH(0);
+            detail.setObp(0.0);
+            detail.setSlg(0.0);
+            detail.setPa(0);
+            detail.setSf(0);
+            stat.updateStat(detail, player);
+            log.info("{} 선수의 스탯 정보가 없음.", player.getName());
+            return player.updateStat(stat);
+        }
+
+        return player.updateStat(stat);
     }
 
     private Player createPlayer(PlayerDto item) {
 
         Team playersTeam = teamRepository.findByTeamCode(item.getTeam());
-
         PlayerStat playerStat = getPlayerStat(item);
 
         return Player.builder()
@@ -59,18 +99,6 @@ public class PlayerProcessor implements ItemProcessor<PlayerDto, Player> {
                 .team(playersTeam)
                 .type(item.getType())
                 .build();
-    }
-
-    private Player updatePlayer(Player player, PlayerDto item) {
-
-        PlayerStat stat = player.getStat();
-        stat.updateStat(item.getDetail());
-
-        if (!item.getPosition().equals(Position.P) && item.getDetail()!=null) {
-            stat.setWrcPlus(calculateWrcPlus(item, leagueStat));
-        }
-
-        return player.updateStat(stat);
     }
 
     private PlayerStat getPlayerStat(PlayerDto item) {
@@ -90,6 +118,7 @@ public class PlayerProcessor implements ItemProcessor<PlayerDto, Player> {
                     .sf(stat.getSf())
                     .obp(stat.getObp())
                     .slg(stat.getSlg())
+                    .ab(stat.getAb())
                     .build();
 
         } catch (Exception e) {
@@ -105,6 +134,7 @@ public class PlayerProcessor implements ItemProcessor<PlayerDto, Player> {
                     .sf(0)
                     .obp(0.0)
                     .slg(0.0)
+                    .ab(0)
                     .build();
 
             log.info("{} 선수의 스탯 정보가 없음.", item.getName());
@@ -117,6 +147,12 @@ public class PlayerProcessor implements ItemProcessor<PlayerDto, Player> {
     }
 
     private int calculateWrcPlus(PlayerDto item, LeagueStat leagueStat) {
+
+        if (leagueStat == null) {
+            leagueStat = leagueStatRepository.findAll().getFirst();
+        }
+
+
         double wOba = getWOba(item);
         double lg_wOba = leagueStat.getLg_wOBA();
         double wOba_sc = wOba / lg_wOba;
@@ -129,13 +165,11 @@ public class PlayerProcessor implements ItemProcessor<PlayerDto, Player> {
         return (int) wrcPlus;
     }
 
-    private double getWOba(PlayerDto item) {
-        PlayerStatDto stat = item.getDetail();
+    private double getWOba(PlayerDto playerDto) {
+        PlayerStatDto stat = playerDto.getDetail();
         return (((0.7 * stat.getBb()) + (0.7 * stat.getIbb()) + (0.7 * stat.getHbp())) +
                 (0.9 * (stat.getH()-stat.getTwoH()-stat.getThreeH()-stat.getHr())) + (1.2 * stat.getTwoH()) + (1.6 * stat.getThreeH()) + (2.0 * stat.getHr()))
                 / (stat.getAb() + stat.getBb() - stat.getIbb() + stat.getHbp() + stat.getSf())
                 ;
     }
-
-
 }

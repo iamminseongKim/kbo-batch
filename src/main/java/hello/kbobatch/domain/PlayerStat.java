@@ -18,6 +18,7 @@ public class PlayerStat {
 
     private Integer pa;
     private Integer h;
+    private Integer ab;
     @Column(name = "2b")
     private Integer h_2b;
     @Column(name = "3b")
@@ -29,14 +30,12 @@ public class PlayerStat {
     private Integer hbp;
     private Double slg;
     private Double obp;
-    private Integer ab;
 
     private Double ops;
-    private Integer wrcPlus;
+    private Double wrcPlus;
 
     @Builder
-    public PlayerStat(Long id, Integer pa, Integer h, Integer h_2b, Integer h_3b, Integer hr, Integer sf, Integer bb, Integer ibb, Integer hbp, Double slg, Double obp, Integer ab) {
-        this.id = id;
+    public PlayerStat(Integer pa, Integer h, Integer h_2b, Integer h_3b, Integer hr, Integer sf, Integer bb, Integer ibb, Integer hbp, Double slg, Double obp, Integer ab) {
         this.pa = pa;
         this.h = h;
         this.h_2b = h_2b;
@@ -52,12 +51,12 @@ public class PlayerStat {
         this.ab = ab;
     }
 
-    public PlayerStat setWrcPlus(int wrcPlus) {
-        this.wrcPlus = wrcPlus;
+    public PlayerStat setWrcPlus(double wrcPlus) {
+        this.wrcPlus = Math.round(wrcPlus * 10.0)  / 10.0;
         return this;
     }
 
-    public void updateStat(PlayerStatDto detail) {
+    public void updateStat(PlayerStatDto detail, Player player) {
         this.pa = detail.getPa();
         this.h = detail.getH();
         this.h_2b = detail.getTwoH();
@@ -71,5 +70,6 @@ public class PlayerStat {
         this.obp = detail.getObp();
         this.ops = detail.getObp() + detail.getSlg();
         this.ab = detail.getAb();
+        player.updateStat(this);
     }
 }

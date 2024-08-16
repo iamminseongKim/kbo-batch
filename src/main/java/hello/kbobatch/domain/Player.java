@@ -34,7 +34,7 @@ public class Player {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @OneToOne(fetch = FetchType.LAZY,cascade =  CascadeType.PERSIST)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "stat_id")
     private PlayerStat stat;
 
@@ -48,8 +48,7 @@ public class Player {
     }
 
     @Builder
-    public Player(Long id, Position position, String name, String backNum, HandsType type, int age, LocalDate birthDate, int height, int weight, Team team, PlayerStat stat) {
-        this.id = id;
+    public Player(Position position, String name, String backNum, HandsType type, int age, LocalDate birthDate, int height, int weight, Team team, PlayerStat stat) {
         this.position = position;
         this.name = name;
         this.backNum = backNum;

@@ -29,14 +29,16 @@ public class LeagueStat {
     private Integer lg_bb;
     private Integer lg_ibb;
     private Integer lg_hbp;
+    private Integer lg_ab;
     private Double lg_slg;
     private Double lg_obp;
 
     private Double lg_wOBA;
 
     @Builder
-    public LeagueStat(Integer lg_pa, Integer lg_r, Integer lg_h, Integer lg_2b, Integer lg_3b, Integer lg_hr, Integer lg_sf, Integer lg_bb, Integer lg_ibb, Integer lg_hbp, Double lg_slg, Double lg_obp) {
+    public LeagueStat(Integer lg_pa, Integer lg_r, Integer lg_h, Integer lg_2b, Integer lg_3b, Integer lg_hr, Integer lg_sf, Integer lg_bb, Integer lg_ibb, Integer lg_hbp, Double lg_slg, Double lg_obp, Integer lg_ab) {
         this.lg_pa = lg_pa;
+        this.lg_ab = lg_ab;
         this.lg_r = lg_r;
         this.lg_h = lg_h;
         this.lg_2b = lg_2b;
@@ -53,6 +55,7 @@ public class LeagueStat {
 
     public LeagueStat update(LeagueStatDto dto) {
         this.lg_pa = dto.getLg_pa();
+        this.lg_ab = dto.getLg_ab();
         this.lg_r = dto.getLg_r();
         this.lg_h = dto.getLg_h();
         this.lg_2b = dto.getLg_2b();

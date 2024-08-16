@@ -1,11 +1,7 @@
 package hello.kbobatch.batch.player;
 
 import hello.kbobatch.batch.BatchListener;
-import hello.kbobatch.batch.league.repository.LeagueStatRepository;
-import hello.kbobatch.domain.LeagueStat;
-import hello.kbobatch.domain.Player;
 import hello.kbobatch.dto.PlayerDto;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -23,15 +19,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Slf4j
-@Configuration
-@RequiredArgsConstructor
+//@Configuration
 public class PlayerBatchConfig {
 
-    private final PlayerRepository playerRepository;
-    private final TeamRepository teamRepository;
-    private final LeagueStatRepository leagueStatRepository;
-
-    @Bean
+   // @Bean
     public ItemReader<PlayerDto> playerReader() {
         return new JsonItemReaderBuilder<PlayerDto>()
                 .name("playerItemReader")
@@ -41,34 +32,36 @@ public class PlayerBatchConfig {
     }
 
 
-    @Bean
+   // @Bean
     public PlayerProcessor processor() {
-        return new PlayerProcessor(teamRepository, playerRepository, leagueStatRepository);
+        return null;
+        //return new PlayerProcessor();
     }
 
-    @Bean
-    public ItemWriter<Player> writer() {
+    //@Bean
+    public ItemWriter<PlayerDto> writer() {
         return items -> {
-            for (Player player : items) {
-                playerRepository.save(player);
+            for (PlayerDto player : items) {
+                //save 로직
+                log.info("Player: {} 저장 완료~", player.getName());
             }
         };
     }
 
-    @Bean
+    //@Bean
     public Job playerBatchJob(JobRepository jobRepository, @Qualifier("playerStep") Step step, BatchListener listener) {
-        return new JobBuilder("playerBatchJob19", jobRepository)
+        return new JobBuilder("playerBatchJob", jobRepository)
                 .listener(listener)
                 .start(step)
                 .build();
     }
 
-    @Bean
+    //@Bean
     public Step playerStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         return new StepBuilder("playerStep", jobRepository)
-                .<PlayerDto, Player> chunk(10, transactionManager)
+                .<PlayerDto, PlayerDto> chunk(10, transactionManager)
                 .reader(playerReader())
-                .processor(processor())
+                //.processor(processor())
                 .writer(writer())
                 .build();
     }

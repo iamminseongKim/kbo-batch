@@ -1,0 +1,10 @@
+INSERT INTO team(team_name, team_code, parkFactor) VALUES('KIA 타이거즈', 'HT', 1.021);
+INSERT INTO team(team_name, team_code, parkFactor) VALUES('LG 트윈스', 'LG', 0.919);
+INSERT INTO team(team_name, team_code, parkFactor) VALUES('삼성 라이온즈', 'SS', 1.052);
+INSERT INTO team(team_name, team_code, parkFactor) VALUES('두산 베어스', 'OB', 0.919);
+INSERT INTO team(team_name, team_code, parkFactor) VALUES('SSG 랜더스', 'SK', 1.038);
+INSERT INTO team(team_name, team_code, parkFactor) VALUES('KT 위즈', 'KT', 0.988);
+INSERT INTO team(team_name, team_code, parkFactor) VALUES('롯데 자이언츠', 'LT', 1.047);
+INSERT INTO team(team_name, team_code, parkFactor) VALUES('NC 다이노스', 'NC', 1.041);
+INSERT INTO team(team_name, team_code, parkFactor) VALUES('한화 이글스', 'HH', 0.997);
+INSERT INTO team(team_name, team_code, parkFactor) VALUES('키움 히어로즈', 'WO', 0.96);

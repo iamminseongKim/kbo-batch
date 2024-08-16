@@ -3,6 +3,7 @@ package hello.kbobatch.domain;
 import hello.kbobatch.domain.type.TeamName;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,5 +32,12 @@ public class Team {
     @OneToMany(mappedBy = "team")
     private List<Player> players = new ArrayList<>();
 
-
+    @Builder
+    public Team(TeamName teamCode, String name, Integer gameCount, Double parkFactor, List<Player> players) {
+        this.teamCode = teamCode;
+        this.name = name;
+        this.gameCount = gameCount;
+        this.parkFactor = parkFactor;
+        this.players = players;
+    }
 }

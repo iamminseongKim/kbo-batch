@@ -8,6 +8,7 @@ public class PlayerStatDto {
 
     private int pa;
     private int h;
+    private int ab;
 
     @JsonProperty("2b")
     private int twoH;
@@ -20,7 +21,7 @@ public class PlayerStatDto {
     private int hbp;
     private double slg;
     private double obp;
-    private int ab;
+
 
     private String era;
     private String inning;

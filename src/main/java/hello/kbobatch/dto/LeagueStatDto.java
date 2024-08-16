@@ -17,4 +17,5 @@ public class LeagueStatDto {
     private int lg_hbp;
     private double lg_slg;
     private double lg_obp;
+    private int lg_ab;
 }

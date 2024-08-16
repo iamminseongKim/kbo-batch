@@ -38,7 +38,7 @@ public class LeagueStatProcessor implements ItemProcessor<LeagueStatDto, LeagueS
                     .lg_pa(item.getLg_pa())
                     .build();
         } else {
-            return all.get(0).update(item);
+            return all.getFirst().update(item);
         }
     }
 }
